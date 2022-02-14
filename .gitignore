@@ -4,3 +4,4 @@ __pycache__/
 *.bak
 *.pyc
 init_db.sh
+.DS_Store
