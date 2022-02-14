@@ -17,7 +17,7 @@ def on_static(path):
 
 @app.route('/subscribe', methods=['GET'])
 def on_subscribe_get():
-    return render_template('subscribe.html', app_id=vk_config['callback']['app_id'])
+    return render_template('subscribe.html', app_id=vk_config['callback']['app_id'], prefix=vk_config['callback']['redirect_prefix'])
 
 
 @app.route('/subscribe', methods=['POST'])
@@ -58,5 +58,5 @@ def on_subscribe_post():
 def on_subscribe_done():
     result = request.args.get('result', '')
     return render_template('subscribe_done.html', result=result,
-                           success_redirect_uri=vk_config['callback']['success_redirect_uri'])
+                           success_redirect_uri=vk_config['callback']['success_redirect_uri'], prefix=vk_config['callback']['redirect_prefix'])
 

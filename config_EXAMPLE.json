@@ -12,7 +12,8 @@
       "secret_key": "",
       "app_id": "",
       "redirect_uri": "",
-      "success_redirect_uri": ""
+      "success_redirect_uri": "",
+      "redirect_prefix": ""
     },
     "proxies": null
   },
