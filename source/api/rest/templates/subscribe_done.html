@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Successfully subscribed!</title>
+    <link href="/static/timer.css" rel="stylesheet">
+    <script src="/static/timer.js"></script>
+    <style>
+        .center {
+            left: 50%;
+        }
+    </style>
+    <script>
+        document.onload = () => {
+            setTimeout(() => {
+                window.location.change('{{success_redirect_uri}}')
+            }, 5500);
+        }
+    </script>
+</head>
+<body>
+<div class="center">
+    <h1>You have successfully subscribed on auto-likes!</h1>
+    <p>{{result}}</p>
+    <div id="app"></div>
+</div>
+
+</body>
+</html>

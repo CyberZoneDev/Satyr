@@ -1,0 +1,22 @@
+{
+  "database": {
+    "name": "",
+    "host": "",
+    "port": "",
+    "user": "",
+    "password": ""
+  },
+  "vk": {
+    "service_key": "",
+    "callback": {
+      "secret_key": "",
+      "app_id": "",
+      "redirect_uri": "",
+      "success_redirect_uri": ""
+    }
+  },
+  "rest": {
+    "host": "localhost",
+    "port": "8000"
+  }
+}

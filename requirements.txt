@@ -1,0 +1,6 @@
+vk_api
+flask
+sqlalchemy
+pytz
+psycopg2-binary
+requests
