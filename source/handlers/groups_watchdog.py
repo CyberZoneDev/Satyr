@@ -55,7 +55,7 @@ class GroupsWatchDog(Thread):
                 users_not_liked = [user for user in self.__users if user.id not in [x.user_id for x in post.likes] and user.token]
                 for user in users_not_liked:
                     try:
-                        vk = Vk(token=user.token.content, proxy=True)
+                        vk = Vk(token=user.token.content)
                         vk.like(group.id, post.id)
                         sleep(1)
                     except Exception as e:

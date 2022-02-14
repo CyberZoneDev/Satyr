@@ -27,7 +27,7 @@ def on_subscribe_post():
         return Reply.bad_request(error='Token was empty')
 
     try:
-        vk = Vk(token=access, proxy=True)
+        vk = Vk(token=access)
         user = vk.who_am_i()
     except Exception as e:
         return Reply.bad_request(error='Token was invalid')
