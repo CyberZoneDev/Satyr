@@ -51,16 +51,15 @@ class GroupsWatchDog(Thread):
         self.__bind_users()
 
         for group in self.__groups:
-            for post in group.posts:
-                users_not_liked = [user for user in self.__users if user.id not in [x.user_id for x in post.likes]]
+             for post in group.posts:
+                users_not_liked = [user for user in self.__users if user.id not in [x.user_id for x in post.likes] and user.token]
                 for user in users_not_liked:
-                    if user.token:
-                        try:
-                            vk = Vk(token=user.token.content)
-                            vk.like(group.id, post.id)
-                            sleep(1)
-                        except:
-                            self.__db_tokens.remove(user.token)
+                    try:
+                        vk = Vk(token=user.token.content, proxy=True)
+                        vk.like(group.id, post.id)
+                        sleep(1)
+                    except Exception as e:
+                        self.__db_tokens.remove(user.token)
 
     def run(self) -> None:
         while True:

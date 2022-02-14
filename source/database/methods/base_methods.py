@@ -20,7 +20,7 @@ class BaseMethod:
         try:
             self.session.add(c_object)
             self.session.commit()
-        except:
+        except Exception as e:
             self.session.rollback()
             return None
 

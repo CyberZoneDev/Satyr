@@ -13,7 +13,8 @@
       "app_id": "",
       "redirect_uri": "",
       "success_redirect_uri": ""
-    }
+    },
+    "proxies": null
   },
   "rest": {
     "host": "localhost",

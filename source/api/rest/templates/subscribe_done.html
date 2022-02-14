@@ -3,26 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Successfully subscribed!</title>
-    <link href="/static/timer.css" rel="stylesheet">
-    <script src="/static/timer.js"></script>
+    <link href="/satyr/static/timer.css" rel="stylesheet">
     <style>
         .center {
-            left: 50%;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
         }
     </style>
     <script>
-        document.onload = () => {
+        window.addEventListener('load', function () {
             setTimeout(() => {
-                window.location.change('{{success_redirect_uri}}')
+                window.location.replace('{{success_redirect_uri}}')
             }, 5500);
-        }
+        })
     </script>
 </head>
 <body>
 <div class="center">
-    <h1>You have successfully subscribed on auto-likes!</h1>
-    <p>{{result}}</p>
+    <h1>Вы успешно подписались на авто-лайки!</h1>
+    <b>{{result}}</b>
+    <p>Вы будете перенаправлены через...</p>
     <div id="app"></div>
+    <script src="/satyr/static/timer.js"></script>
 </div>
 
 </body>

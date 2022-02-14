@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Getting token...</title>
+    <link href="/satyr/static/timer.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <style>
+        .center {
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            text-align: center;
+        }
+
+        .promise {
+            font-size: 2rem;
+        }
+
+        #error {
+            color: darkred;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            document.getElementById('raw_token_field').onkeyup = function (x) {
+                let url = document.getElementById('raw_token_field').value;
+
+                let access = '';
+                try {
+                    access = url.match('#access_token=([a-z0-9]{85})')[1];
+                } catch {
+
+                }
+
+                if (access.length === 85) {
+                    fetch('/satyr/subscribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({access: access})
+                    }).then((x) => {
+                        if (x.status !== 200)
+                            throw new Error("Status code was not OK");
+                        return x.json()
+                    }).then((x) => {
+                        window.location.replace('/satyr/subscribe_done?result=' + x.response.result)
+                    }).catch((x) => {
+                        document.getElementById('error').innerText = 'Что-то пошло не так...\n' + x.toString() + '\nПожалуйста, скиньте скрин этой страницы администраторам'
+                    })
+
+                } else {
+                    document.getElementById('error').innerText = 'Похоже, это не ссылка'
+                }
+            }
+
+
+        }
+    </script>
+</head>
+<body>
+<div class="center">
+    <h1 class="promise">Перейди по ссылке и ссылку из адресной строки в поле ниже.</h1>
+    <h2 id="error"></h2>
+    <h2>
+        <a href="https://oauth.vk.com/authorize?client_id={{app_id}}&redirect_uri=https://oauth.vk.com/blank.html&display=page&scope=73728&response_type=token&revoke=1" target="_blank">Ссылка</a>
+    </h2>
+    <h3>
+        <a href="https://telegra.ph/Pochemu-nado-perehodit-po-ssylke-i-skidyvat-cheto-Osobenno-kogda-VK-govorit-tak-ne-delat-02-14" target="_blank">Почему
+            так?</a></h3>
+    <input id="raw_token_field" type="text" class="form-control" placeholder="Адресная строка..."/>
+</div>
+</body>
+</html>
