@@ -16,8 +16,8 @@
             flex-flow: column nowrap;
             align-items: center;
             text-align: center;
-            margin-top: 10%;
         }
+
         .promise {
             font-size: 2rem;
         }
@@ -27,13 +27,19 @@
         }
     </style>
     <script>
-        async function transfer_from_buffer(){
+        async function transfer_from_buffer() {
             document.getElementById('raw_token_field').value = await navigator.clipboard.readText();
             document.getElementById('raw_token_field').dispatchEvent(new CustomEvent('keyup', null));
         }
+
         window.onload = function () {
             document.getElementById('raw_token_field').onkeyup = function (x) {
                 let url = document.getElementById('raw_token_field').value;
+
+                if (url === ''){
+                    document.getElementById('error').innerText = '';
+                    return;
+                }
 
                 let access = '';
                 try {
@@ -69,17 +75,22 @@
     </script>
 </head>
 <body>
-<div class="center">
-    <h1 class="promise">Перейди по ссылке и вставь ссылку из адресной строки в поле ниже.</h1>
-    <h2 id="error"></h2>
-    <h2>
-        <a href="https://oauth.vk.com/authorize?client_id={{app_id}}&redirect_uri=https://oauth.vk.com/blank.html&display=page&scope=73728&response_type=token&revoke=1" target="_blank">Ссылка</a>
-    </h2>
-    <h3>
-        <a href="https://telegra.ph/Pochemu-nado-perehodit-po-ssylke-i-skidyvat-cheto-Osobenno-kogda-VK-govorit-tak-ne-delat-02-14" target="_blank">Почему
-            так?</a></h3>
-    <input id="raw_token_field" type="text" class="form-control" placeholder="Адресная строка..."/>
-    <button class="btn" onclick="transfer_from_buffer()">Вставить</button>
+<div class="col-md-8 mx-auto">
+    <div class="center">
+        <h1 class="promise">Перейди по ссылке и вставь ссылку из адресной строки в поле ниже.</h1>
+        <img src="{{prefix}}/static/video/how_to.gif" alt="this slowpoke moves"  width="1000" height="600" />
+        <h2 id="error"></h2>
+        <h2>
+            <a href="https://oauth.vk.com/authorize?client_id={{app_id}}&redirect_uri=https://oauth.vk.com/blank.html&display=page&scope=73728&response_type=token&revoke=1"
+               target="_blank">Ссылка</a>
+        </h2>
+        <h3>
+            <a href="https://telegra.ph/Pochemu-nado-perehodit-po-ssylke-i-skidyvat-cheto-Osobenno-kogda-VK-govorit-tak-ne-delat-02-14"
+               target="_blank">Почему
+                так?</a></h3>
+        <input id="raw_token_field" type="text" class="form-control" placeholder="Адресная строка..."/>
+        <button class="btn" onclick="transfer_from_buffer()">Вставить</button>
+    </div>
 </div>
 </body>
 </html>
