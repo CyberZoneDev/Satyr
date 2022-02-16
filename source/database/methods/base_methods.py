@@ -26,12 +26,12 @@ class BaseMethod:
 
         return c_object
 
-    def remove(self, c_object: BaseModel) -> bool:
+    def delete(self, c_object: BaseModel) -> bool:
         if not isinstance(c_object, self.type):
             raise TypeError(f'Invalid type. Wanted: {self.type}, Got: {c_object.__class__}')
 
         try:
-            self.session.remove(c_object)
+            self.session.delete(c_object)
             self.session.commit()
             return True
         except:

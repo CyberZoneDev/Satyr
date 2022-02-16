@@ -1,10 +1,14 @@
+from time import sleep
+from threading import Thread
+from vk_api import ApiError
+import asyncio
+import random
+
 from source.api import Vk
 from source.database.methods import *
 from source.database.models import *
 from source.database import Session
-
-from time import sleep
-from threading import Thread
+from source.utils import Utils
 
 
 class GroupsWatchDog(Thread):
@@ -19,6 +23,17 @@ class GroupsWatchDog(Thread):
         self.__db_users = UserMethods(session=self.__db_session)
         self.__db_tokens = TokenMethods(session=self.__db_session)
         self.__service_vk = Vk()
+
+    async def __like(self, token: Token, group: Group, post: Post, delay: int) -> bool:
+        sleep(delay)
+        try:
+            vk = Vk(token=token.content)
+            vk.like(group.id, post.id)
+            return True
+        except ApiError as e:
+            if e.error.get('error_code') == 5:  # Invalid token
+                self.__db_tokens.delete(token)
+            return False
 
     def __bind_groups(self) -> None:
         self.__groups = self.__db_groups.get()
@@ -49,17 +64,26 @@ class GroupsWatchDog(Thread):
             self.__bind_likes(group_id=group.id)
 
         self.__bind_users()
+        tasks = []
+        loop = Utils.get_event_loop()
+        asyncio.set_event_loop(loop)
 
-        for group in self.__groups:
-             for post in group.posts:
-                users_not_liked = [user for user in self.__users if user.id not in [x.user_id for x in post.likes] and user.token]
-                for user in users_not_liked:
-                    try:
-                        vk = Vk(token=user.token.content)
-                        vk.like(group.id, post.id)
-                        sleep(1)
-                    except Exception as e:
-                        self.__db_tokens.remove(user.token)
+        for group in self.__db_groups.get():
+            for post in group.posts:
+                users_not_liked = [user for user in self.__users if
+                                   user.id not in [x.user_id for x in post.likes] and user.token]
+                random.shuffle(users_not_liked)
+
+                if len(users_not_liked) > 0:
+                    will_handled = random.randint(1, len(users_not_liked))
+                    for user in users_not_liked:
+                        tasks.append(self.__like(user.token, group, post, random.randint(5, 120)))
+
+                        if len(tasks) == will_handled:
+                            break
+
+                    loop.run_until_complete(asyncio.wait(tasks))
+                    tasks.clear()
 
     def run(self) -> None:
         while True:
