@@ -20,5 +20,10 @@
   "rest": {
     "host": "localhost",
     "port": "8000"
+  },
+  "logging": {
+    "enable": true,
+    "path": "satyr.log"
   }
+
 }

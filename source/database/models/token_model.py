@@ -6,7 +6,7 @@ from pytz import timezone
 
 from .. import Base
 from .base_model import BaseModel
-from .user import User
+from .user_model import User
 
 
 class Token(Base, BaseModel):

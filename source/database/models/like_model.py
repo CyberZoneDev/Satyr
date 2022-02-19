@@ -7,8 +7,8 @@ from pytz import timezone
 
 from .. import Base
 from .base_model import BaseModel
-from .user import User
-from .post import Post
+from .user_model import User
+from .post_model import Post
 
 
 class Like(Base, BaseModel):

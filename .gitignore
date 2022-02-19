@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 init_db.sh
 .DS_Store
+*.log

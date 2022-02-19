@@ -5,7 +5,7 @@ from pytz import timezone
 
 from .. import Base
 from .base_model import BaseModel
-from .group import Group
+from .group_model import Group
 
 
 class Post(Base, BaseModel):

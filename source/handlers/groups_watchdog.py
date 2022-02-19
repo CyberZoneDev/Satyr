@@ -3,6 +3,7 @@ from threading import Thread
 from vk_api import ApiError
 import asyncio
 import random
+import logging
 
 from source.api import Vk
 from source.database.methods import *
@@ -23,6 +24,7 @@ class GroupsWatchDog(Thread):
         self.__db_users = UserMethods(session=self.__db_session)
         self.__db_tokens = TokenMethods(session=self.__db_session)
         self.__service_vk = Vk()
+        self.__logger = logging.getLogger(GroupsWatchDog.__name__)
 
     async def __like(self, token: Token, group: Group, post: Post, delay: int) -> bool:
         sleep(delay)
@@ -31,7 +33,9 @@ class GroupsWatchDog(Thread):
             vk.like(group.id, post.id)
             return True
         except ApiError as e:
+            self.__logger.warning(f'Something went wrong with user_id: {token.user_id}.\n{str(e)}')
             if e.error.get('error_code') == 5:  # Invalid token
+                self.__logger.warning(f'I will remove token for user_id: {token.user_id}')
                 self.__db_tokens.delete(token)
             return False
 
@@ -59,11 +63,11 @@ class GroupsWatchDog(Thread):
 
     def __routine(self) -> None:
         self.__bind_groups()
-
-        for group in self.__groups:
-            self.__bind_likes(group_id=group.id)
-
+        [self.__bind_likes(group_id=x.id) for x in self.__groups]
         self.__bind_users()
+
+        self.__logger.debug('Info bound')
+
         tasks = []
         loop = Utils.get_event_loop()
         asyncio.set_event_loop(loop)
@@ -75,17 +79,25 @@ class GroupsWatchDog(Thread):
                 random.shuffle(users_not_liked)
 
                 if len(users_not_liked) > 0:
-                    will_handled = random.randint(1, len(users_not_liked))
                     for user in users_not_liked:
-                        tasks.append(self.__like(user.token, group, post, random.randint(5, 120)))
+                        # Will like post with some random delay
+                        tasks.append(self.__like(user.token, group, post, random.randint(60, 10000)))
 
-                        if len(tasks) == will_handled:
-                            break
-
-                    loop.run_until_complete(asyncio.wait(tasks))
-                    tasks.clear()
+        if tasks:
+            loop.run_until_complete(asyncio.wait(tasks))
+            tasks.clear()
 
     def run(self) -> None:
+        retries = 0
+        self.__logger.info('Work started')
         while True:
-            self.__routine()
+            try:
+                self.__routine()
+                retries = 0
+            except Exception as e:
+                self.__logger.error(f'Something went wrong with routine:\n{str(e)}')
+                if retries == 3:
+                    self.__logger.fatal('Tried to restart routine 3 times. Shutting down...')
+                    exit(-1)
+                retries += 1
             sleep(30)

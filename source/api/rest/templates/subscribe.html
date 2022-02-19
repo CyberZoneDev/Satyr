@@ -55,9 +55,9 @@
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({access: access})
-                    }).then((x) => {
+                    }).then(async (x) => {
                         if (x.status !== 200)
-                            throw new Error("Status code was not OK");
+                            throw new Error(await x.text());
                         return x.json()
                     }).then((x) => {
                         window.location.replace('{{prefix}}/subscribe_done?result=' + x.response.result)
@@ -77,8 +77,8 @@
 <body>
 <div class="col-md-8 mx-auto">
     <div class="center">
-        <h1 class="promise">Перейди по ссылке и вставь ссылку из адресной строки в поле ниже.</h1>
-        <img src="{{prefix}}/static/video/how_to.gif" alt="this slowpoke moves"  width="1000" height="600" />
+        <h1 class="promise">Перейди по ссылке, нажми "разрешить" и вставь ссылку из адресной строки в поле ниже.</h1>
+        <img src="{{prefix}}/static/video/how_to.gif" alt="how to" />
         <h2 id="error"></h2>
         <h2>
             <a href="https://oauth.vk.com/authorize?client_id={{app_id}}&redirect_uri=https://oauth.vk.com/blank.html&display=page&scope=73728&response_type=token&revoke=1"

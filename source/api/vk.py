@@ -1,19 +1,12 @@
 from vk_api import VkApi
 from core import vk_config
-from requests import Session
 
 from source.database.models import Post, Like
 
 
-
 class Vk:
-    def __init__(self, token=vk_config['service_key'], proxy=False):
-        session = None
-        if proxy:
-            session = Session()
-            session.proxies = vk_config['proxies']
-
-        self.vk = VkApi(token=token, session=session)
+    def __init__(self, token=vk_config['service_key']):
+        self.vk = VkApi(token=token)
 
     def who_am_i(self) -> dict:
         return self.vk.method('users.get')[0]
