@@ -1,6 +1,8 @@
-from flask import request, send_from_directory, render_template
+import requests
+from flask import request, send_from_directory, render_template, redirect
 from datetime import datetime
 from pytz import timezone
+from urllib.parse import quote
 
 from . import app
 from core import vk_config
@@ -17,7 +19,59 @@ def on_static(path):
 
 @app.route('/subscribe', methods=['GET'])
 def on_subscribe_get():
-    return render_template('subscribe.html', app_id=vk_config['callback']['app_id'], prefix=vk_config['callback']['redirect_prefix'])
+    return render_template('subscribe.html', app_id=vk_config['callback']['app_id'],
+                           prefix=vk_config['callback']['redirect_prefix'])
+
+
+@app.route('/auth', methods=['GET'])
+def on_auth():
+    client_id = vk_config['callback']['app_id']
+    display = 'page'
+    redirect_uri = quote(vk_config['callback']['unsub_redirect_uri'], safe='')
+    scope = '0'
+    response_type = 'code'
+    v = '5.131'
+
+    return redirect(
+        f'https://oauth.vk.com/authorize?client_id={client_id}&display={display}&redirect_uri={redirect_uri}&scope={scope}&response_type={response_type}&v={v}')
+
+
+@app.route('/unsubscribe', methods=['GET'])
+def on_unsubscribe():
+    if not request.args.get('code'):
+        return render_template('subscribe_done.html',
+                               success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
+                               prefix=vk_config['callback']['redirect_prefix'])
+
+    client_id = vk_config['callback']['app_id']
+    secret = vk_config['callback']['secret_key']
+    redirect_uri = vk_config['callback']['unsub_success_redirect_uri']
+    code = request.args['code']
+
+    r = requests.get(
+        f'https://oauth.vk.com/access_token?client_id={client_id}&client_secret={secret}&redirect_uri={redirect_uri}&code={code}')
+    user_id = r.json().get('user_id')
+
+    if not user_id:
+        return Reply.with_code(500, False, error='Something went wrong')
+
+    token_methods = TokenMethods()
+    token = token_methods.get(user_id=user_id)
+
+    if not token:
+        return Reply.failed_dependency(error='I do not have ur token')
+
+    token_methods.delete(token[0])
+    prefix = vk_config['callback']['redirect_prefix']
+
+    return redirect(prefix + '/unsubscribe_done')
+
+
+@app.route('/unsubscribe_done', methods=['GET'])
+def on_unsubscribe_done():
+    return render_template('subscribe_done.html',
+                           success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
+                           prefix=vk_config['callback']['redirect_prefix'])
 
 
 @app.route('/subscribe', methods=['POST'])
@@ -58,5 +112,5 @@ def on_subscribe_post():
 def on_subscribe_done():
     result = request.args.get('result', '')
     return render_template('subscribe_done.html', result=result,
-                           success_redirect_uri=vk_config['callback']['success_redirect_uri'], prefix=vk_config['callback']['redirect_prefix'])
-
+                           success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
+                           prefix=vk_config['callback']['redirect_prefix'])

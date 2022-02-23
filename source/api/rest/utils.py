@@ -43,3 +43,7 @@ class Reply:
         if not kwargs:
             return json.dumps({'status': False, 'response': {'error': 'Failed dependency'}}), 424
         return json.dumps({'status': False, 'response': kwargs}), 424
+
+    @staticmethod
+    def with_code(status_code: int, status: bool, **kwargs):
+        return json.dumps({'status': status, 'response': kwargs}), status_code
