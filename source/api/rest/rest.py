@@ -50,6 +50,7 @@ def on_unsubscribe():
     redirect_uri = quote(vk_config['callback']['unsub_redirect_uri'], safe='')
     code = request.args['code']
 
+    raise Exception()
     r = requests.get(
         f'https://oauth.vk.com/access_token?client_id={client_id}&client_secret={secret}&redirect_uri={redirect_uri}&code={code}')
     user_id = r.json().get('user_id')
