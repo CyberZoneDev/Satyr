@@ -47,7 +47,7 @@ def on_unsubscribe():
 
     client_id = vk_config['callback']['app_id']
     secret = vk_config['callback']['secret_key']
-    redirect_uri = vk_config['callback']['unsub_success_redirect_uri']
+    redirect_uri = quote(vk_config['callback']['unsub_redirect_uri'], safe='')
     code = request.args['code']
 
     r = requests.get(
