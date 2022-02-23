@@ -39,7 +39,7 @@ def on_auth():
 @app.route('/unsubscribe', methods=['GET'])
 def on_unsubscribe():
     if not request.args.get('code'):
-        return render_template('subscribe_done.html',
+        return render_template('unsubscribe.html',
                                success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
                                prefix=vk_config['callback']['redirect_prefix'])
 
