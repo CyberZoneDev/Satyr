@@ -38,10 +38,12 @@ def on_auth():
 
 @app.route('/unsubscribe', methods=['GET'])
 def on_unsubscribe():
+    prefix = vk_config['callback']['redirect_prefix']
+
     if not request.args.get('code'):
         return render_template('unsubscribe.html',
-                               success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
-                               prefix=vk_config['callback']['redirect_prefix'])
+                               unsub_redirect_url=prefix + '/auth',
+                               deny_redirect_url=vk_config['callback']['sub_success_redirect_uri'])
 
     client_id = vk_config['callback']['app_id']
     secret = vk_config['callback']['secret_key']
@@ -62,7 +64,6 @@ def on_unsubscribe():
         return Reply.failed_dependency(error='I do not have ur token')
 
     token_methods.delete(token[0])
-    prefix = vk_config['callback']['redirect_prefix']
 
     return redirect(prefix + '/unsubscribe_done')
 
