@@ -65,12 +65,12 @@ def on_unsubscribe():
 
     token_methods.delete(token[0])
 
-    return redirect(prefix + '/unsubscribe_done')
+    return redirect(vk_config['callback']['unsub_success_redirect_uri'])
 
 
 @app.route('/unsubscribe_done', methods=['GET'])
 def on_unsubscribe_done():
-    return render_template('subscribe_done.html',
+    return render_template('unsubscribe_done.html',
                            success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
                            prefix=vk_config['callback']['redirect_prefix'])
 
