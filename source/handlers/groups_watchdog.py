@@ -27,7 +27,7 @@ class GroupsWatchDog(Thread):
         self.__logger = logging.getLogger(GroupsWatchDog.__name__)
 
     async def __like(self, token: Token, group: Group, post: Post, delay: int) -> bool:
-        sleep(delay)
+        await asyncio.sleep(delay)
         try:
             vk = Vk(token=token.content)
             vk.like(group.id, post.id)
