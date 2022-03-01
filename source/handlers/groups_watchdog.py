@@ -69,8 +69,6 @@ class GroupsWatchDog(Thread):
         self.__logger.debug('Info bound')
 
         tasks = []
-        loop = Utils.get_event_loop()
-        asyncio.set_event_loop(loop)
 
         for group in self.__db_groups.get():
             for post in group.posts:
@@ -84,8 +82,10 @@ class GroupsWatchDog(Thread):
                         tasks.append(self.__like(user.token, group, post, random.randint(60, 10000)))
 
         if tasks:
+            loop = Utils.get_event_loop()
             loop.run_until_complete(asyncio.wait(tasks))
             tasks.clear()
+            loop.close()
 
     def run(self) -> None:
         retries = 0
