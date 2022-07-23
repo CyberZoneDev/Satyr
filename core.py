@@ -1,5 +1,9 @@
 import json
 import logging
+from os import environ
+
+if not environ.get('S_T_K'):
+    raise Exception('S_T_K is not set')
 
 config = json.load(open('config.json', 'r', encoding='UTF-8'))
 

@@ -4,3 +4,4 @@ sqlalchemy
 pytz
 psycopg2-binary
 requests
+aes-cipher

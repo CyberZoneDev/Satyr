@@ -11,7 +11,7 @@ class BaseMethod:
         return [x for x in self.session.query(self.type).filter_by(**kwargs)]
 
     def exists(self, **kwargs) -> bool:
-        return bool([x for x in self.session.query(self.type).filter_by(**kwargs)])
+        return bool(self.get(**kwargs))
 
     def add(self, c_object: BaseModel):
         if not isinstance(c_object, self.type):
@@ -20,7 +20,7 @@ class BaseMethod:
         try:
             self.session.add(c_object)
             self.session.commit()
-        except Exception as e:
+        except:
             self.session.rollback()
             return None
 
