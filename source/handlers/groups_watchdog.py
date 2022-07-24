@@ -29,14 +29,14 @@ class GroupsWatchDog(Thread):
     async def __like(self, token: Token, group: Group, post: Post, delay: int) -> bool:
         await asyncio.sleep(delay)
         try:
-            vk = Vk(token=token.content)
+            vk = Vk(token=token.get_decoded_content())
             vk.like(group.id, post.id)
             return True
         except ApiError as e:
             self.__logger.warning(f'Something went wrong with user_id: {token.user_id}.\n{str(e)}')
             if e.error.get('error_code') == 5:  # Invalid token
-                self.__logger.warning(f'I will remove token for user_id: {token.user_id}')
-                self.__db_tokens.delete(token)
+                self.__logger.warning(f'I will disable token for user_id: {token.user_id}')
+                self.__db_tokens.disable(token)
             return False
 
     def __bind_groups(self) -> None:
@@ -73,7 +73,8 @@ class GroupsWatchDog(Thread):
         for group in self.__db_groups.get():
             for post in group.posts:
                 users_not_liked = [user for user in self.__users if
-                                   user.id not in [x.user_id for x in post.likes] and user.token]
+                                   user.id not in [x.user_id for x in
+                                                   post.likes] and user.token and user.token.dl is False]
                 random.shuffle(users_not_liked)
 
                 if len(users_not_liked) > 0:

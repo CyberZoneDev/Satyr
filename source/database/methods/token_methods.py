@@ -25,8 +25,22 @@ class TokenMethods(BaseMethod):
         return c_object
 
     def get(self, **kwargs) -> list:
+        kwargs['dl'] = kwargs.get('dl') if kwargs.get('dl') else False
+
         result = [x for x in self.session.query(self.type).filter_by(**kwargs)]
         for res in result:
             res.content = Aes.decrypt(res.content, environ['S_T_K'])
 
         return result
+
+    def disable(self, c_object: Token) -> None:
+        if not isinstance(c_object, self.type):
+            raise TypeError(f'Invalid type. Wanted: {self.type}, Got: {c_object.__class__}')
+
+        c_object.dl = True
+
+        try:
+            self.session.commit()
+        except:
+            self.session.rollback()
+
