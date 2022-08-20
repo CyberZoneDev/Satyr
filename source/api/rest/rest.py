@@ -10,6 +10,8 @@ from source.api import Vk
 from source.database.methods import TokenMethods, UserMethods
 from source.database.models import Token, User
 from .utils import Reply
+from source.utils import Aes
+from os import environ
 
 
 @app.route('/static/<path:path>', methods=['GET'])
@@ -95,8 +97,9 @@ def on_subscribe_post():
 
     if token:
         token = token[0]
-        token.content = access
+        token.content = Aes.encrypt(access, environ['S_T_K'])
         token.added_date = datetime.now(timezone('Europe/Moscow'))
+        token.dl = False
         token_methods.update(token)
         result = 'Токен был обновлен'
     else:

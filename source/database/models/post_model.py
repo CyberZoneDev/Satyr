@@ -17,7 +17,8 @@ class Post(Base, BaseModel):
 
     likes = relationship('Like', uselist=True)
 
-    def __init__(self, id: int, group_id: int):
+    def __init__(self, id: int, group_id: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.id = id
         self.group_id = group_id
         self.added_date = datetime.now(timezone('Europe/Moscow'))

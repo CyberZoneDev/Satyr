@@ -15,7 +15,8 @@ class Group(Base, BaseModel):
 
     posts = relationship('Post', uselist=True)
 
-    def __init__(self, id: int):
+    def __init__(self, id: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.id = id
         self.added_date = datetime.now(timezone('Europe/Moscow'))
 

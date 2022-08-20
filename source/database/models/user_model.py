@@ -16,7 +16,8 @@ class User(Base, BaseModel):
     likes = relationship('Like', uselist=True)
     token = relationship('Token', uselist=False)
 
-    def __init__(self, id: int):
+    def __init__(self, id: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.id = id
         self.added_date = datetime.now(timezone('Europe/Moscow'))
 

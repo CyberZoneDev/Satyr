@@ -16,7 +16,8 @@
         }
 
         function on_deny() {
-            window.location.replace("{{ deny_redirect_url }}");
+            history.back()
+            // window.location.replace("{{ deny_redirect_url }}");
         }
     </script>
 

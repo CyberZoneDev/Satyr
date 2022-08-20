@@ -5,4 +5,4 @@ from core import rest_config
 gwd = GroupsWatchDog()
 gwd.start()
 
-app.run(**rest_config, debug=False)
+app.run(**rest_config, debug=True)

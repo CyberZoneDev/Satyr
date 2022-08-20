@@ -80,7 +80,7 @@ class GroupsWatchDog(Thread):
                 if len(users_not_liked) > 0:
                     for user in users_not_liked:
                         # Will like post with some random delay
-                        tasks.append(self.__like(user.token, group, post, random.randint(60, 10000)))
+                        tasks.append(self.__like(user.token, group, post, random.randint(60, 86400)))
 
         if tasks:
             loop = Utils.get_event_loop()

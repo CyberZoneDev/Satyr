@@ -19,7 +19,8 @@ class Like(Base, BaseModel):
     user_id = Column(BigInteger, ForeignKey(User.id))
     added_date = Column(DateTime, nullable=False, default=datetime.now(timezone('Europe/Moscow')))
 
-    def __init__(self, post_id: int, user_id: int):
+    def __init__(self, post_id: int, user_id: int, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.post_id = post_id
         self.user_id = user_id
         self.added_date = datetime.now(timezone('Europe/Moscow'))

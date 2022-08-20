@@ -3,6 +3,5 @@ __pycache__/
 .idea/
 *.bak
 *.pyc
-init_db.sh
 .DS_Store
 *.log

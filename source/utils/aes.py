@@ -1,18 +1,17 @@
 from aes_cipher import DataEncrypter, DataDecrypter
-from base64 import encodebytes, decodebytes
 
 
 class Aes:
     @staticmethod
-    def encrypt(raw: str, password: str) -> str:
+    def encrypt(raw: str, password: str) -> bytes:
         de = DataEncrypter()
         de.Encrypt(raw, [password])
 
-        return encodebytes(de.GetEncryptedData()).decode('UTF-8')
+        return de.GetEncryptedData()
 
     @staticmethod
-    def decrypt(encoded: str, password: str) -> str:
+    def decrypt(encoded: bytes, password: str) -> str:
         dd = DataDecrypter()
-        dd.Decrypt(decodebytes(encoded.encode()), [password])
+        dd.Decrypt(encoded, [password])
 
         return dd.GetDecryptedData().decode('UTF-8')

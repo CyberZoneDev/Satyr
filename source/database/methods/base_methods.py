@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .. import Session
 from ..models.base_model import BaseModel
 
@@ -13,7 +15,7 @@ class BaseMethod:
     def exists(self, **kwargs) -> bool:
         return bool(self.get(**kwargs))
 
-    def add(self, c_object: BaseModel):
+    def add(self, c_object: BaseModel) -> Optional[BaseModel]:
         if not isinstance(c_object, self.type):
             raise TypeError(f'Invalid type. Wanted: {self.type}, Got: {c_object.__class__}')
 
@@ -38,7 +40,7 @@ class BaseMethod:
             self.session.rollback()
             return False
 
-    def update(self, c_object: BaseModel):
+    def update(self, c_object: BaseModel) -> Optional[BaseModel]:
         if not isinstance(c_object, self.type):
             raise TypeError(f'Invalid type. Wanted: {self.type}, Got: {c_object.__class__}')
 
