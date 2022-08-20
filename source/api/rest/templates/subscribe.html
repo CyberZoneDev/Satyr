@@ -69,7 +69,7 @@
                             throw new Error(await x.text());
                         return x.json()
                     }).then((x) => {
-                        // window.location.replace('{{prefix}}/subscribe_done?result=' + x.response.result)
+                        window.location.replace('{{prefix}}/subscribe_done?result=' + x.response.result)
                     }).catch((x) => {
                         document.getElementById('error').innerText = 'Что-то пошло не так...\n' + x.toString() + '\nПожалуйста, скиньте скрин этой страницы администраторам'
                     })
