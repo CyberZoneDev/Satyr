@@ -1,90 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting token...</title>
-    <link href="{{ prefix }}/static/timer.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-            crossorigin="anonymous"></script>
-    <style>
-        .center {
-            display: flex;
-            flex-flow: column nowrap;
-            align-items: center;
-            text-align: center;
-        }
+{% extends "base.html" %}
+{% block head %}
+<style>
+    .center {
+        display: flex;
+        flex-flow: column nowrap;
+        align-items: center;
+        text-align: center;
+    }
 
-        .promise {
-            font-size: 2rem;
-        }
+    .promise {
+        font-size: 2rem;
+    }
 
-        #error {
-            color: darkred;
-        }
-    </style>
-    <script>
-        async function transfer_from_buffer() {
-            document.getElementById('raw_token_field').value = await navigator.clipboard.readText();
-            document.getElementById('raw_token_field').dispatchEvent(new CustomEvent('keyup', null));
-        }
+    #error {
+        color: darkred;
+    }
 
-        function getParameterByName(name, url = window.location.href) {
-            name = name.replace(/[\[\]]/g, '\\$&');
-            var regex = new RegExp('[#&]' + name + '(=([^&#]*)|&|#|$)'),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, ' '));
-        }
+    .main {
+        height: 100%;
+        margin-top: 50px;
+    }
+</style>
+<script>
+    async function transfer_from_buffer() {
+        document.getElementById('raw_token_field').value = await navigator.clipboard.readText();
+        document.getElementById('raw_token_field').dispatchEvent(new CustomEvent('keyup', null));
+    }
 
-        window.onload = function () {
-            document.getElementById('raw_token_field').onkeyup = function (x) {
-                let url = document.getElementById('raw_token_field').value;
+    function getParameterByName(name, url = window.location.href) {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[#&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
 
-                if (url === '') {
-                    document.getElementById('error').innerText = '';
-                    return;
-                }
+    window.onload = function () {
+        document.getElementById('raw_token_field').onkeyup = function (x) {
+            let url = document.getElementById('raw_token_field').value;
 
-                let access = '';
-                try {
-                    access = getParameterByName('access_token', url)
-                } catch {
-
-                }
-
-                if (access?.length === 198) {
-                    fetch('{{prefix}}/subscribe', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({access: access})
-                    }).then(async (x) => {
-                        if (x.status !== 200)
-                            throw new Error(await x.text());
-                        return x.json()
-                    }).then((x) => {
-                        window.location.replace('{{prefix}}/subscribe_done?result=' + x.response.result)
-                    }).catch((x) => {
-                        document.getElementById('error').innerText = 'Что-то пошло не так...\n' + x.toString() + '\nПожалуйста, скиньте скрин этой страницы администраторам'
-                    })
-
-                } else {
-                    document.getElementById('error').innerText = 'Похоже, это не то'
-                }
+            if (url === '') {
+                document.getElementById('error').innerText = '';
+                return;
             }
 
+            let access = '';
+            try {
+                access = getParameterByName('access_token', url)
+            } catch {
 
+            }
+
+            if (access?.length === 198) {
+                fetch('{{prefix}}/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({access: access})
+                }).then(async (x) => {
+                    if (x.status !== 200)
+                        throw new Error(await x.text());
+                    return x.json()
+                }).then((x) => {
+                    window.location.replace('{{prefix}}/subscribe_done?result=' + x.response.result)
+                }).catch((x) => {
+                    document.getElementById('error').innerText = 'Что-то пошло не так...\n' + x.toString() + '\nПожалуйста, скиньте скрин этой страницы администраторам'
+                })
+
+            } else {
+                document.getElementById('error').innerText = 'Похоже, это не то'
+            }
         }
-    </script>
-</head>
-<body>
-<div class="col-md-8 mx-auto">
+    }
+</script>
+{% endblock %}
+{% block content %}
+<div class="main d-flex justify-content-center align-items-center">
     <div class="center">
         <h1 class="promise">Перейди по ссылке, нажми "разрешить" и вставь содержимое адресной строки в поле ниже.</h1>
         <img src="{{ prefix }}/static/video/how_to.gif" alt="how to"/>
@@ -99,8 +92,7 @@
                 это безопасно?</a></h3>
         <input id="raw_token_field" type="text" class="form-control" placeholder="Содержимое адресной строки..."/>
         <button class="btn" onclick="transfer_from_buffer()">Вставить</button>
-        <div>Вы всегда можете <a href="{{prefix}}/unsubscribe">отписаться</a></div>
+        <div>Вы всегда можете <a href="{{ prefix }}/unsubscribe">отписаться</a></div>
     </div>
 </div>
-</body>
-</html>
+{% endblock %}

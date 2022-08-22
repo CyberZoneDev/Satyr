@@ -28,6 +28,8 @@ class GroupsWatchDog(Thread):
 
     async def __like(self, token: Token, group: Group, post: Post, delay: int) -> bool:
         await asyncio.sleep(delay)
+        if not self.__db_tokens.get(uid=token.uid):  # User unsubscribed, but task is exists
+            return False
         try:
             vk = Vk(token=token.get_decoded_content())
             vk.like(group.id, post.id)
@@ -35,7 +37,10 @@ class GroupsWatchDog(Thread):
         except ApiError as e:
             self.__logger.warning(f'Something went wrong with user_id: {token.user_id}.\n{str(e)}')
             if e.error.get('error_code') == 5:  # Invalid token
-                self.__logger.warning(f'I will disable token for user_id: {token.user_id}')
+                self.__logger.warning(f'I will disable token for user_id: {token.user_id} cause of 5')
+                self.__db_tokens.disable(token)
+            elif e.error.get('error_code') == 18:
+                self.__logger.warning(f'I will disable token for user_id: {token.user_id} cause of 18')
                 self.__db_tokens.disable(token)
             return False
 
