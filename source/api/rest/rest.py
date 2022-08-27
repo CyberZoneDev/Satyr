@@ -22,7 +22,7 @@ def on_static(path):
 @app.route('/subscribe', methods=['GET'])
 def on_subscribe_get():
     return render_template('subscribe.html', app_id=vk_config['callback']['app_id'],
-                           prefix=vk_config['callback']['redirect_prefix'], version=str(VERSION), created_at=str(version_raw['created']))
+                           prefix=vk_config['callback']['redirect_prefix'], version=VERSION, created_at=str(version_raw['created']))
 
 
 @app.route('/auth', methods=['GET'])
@@ -45,7 +45,7 @@ def on_unsubscribe():
     if not request.args.get('code'):
         return render_template('unsubscribe.html',
                                unsub_redirect_url=prefix + '/auth',
-                               deny_redirect_url=vk_config['callback']['sub_success_redirect_uri'], version=str(VERSION), created_at=str(version_raw['created']))
+                               deny_redirect_url=vk_config['callback']['sub_success_redirect_uri'], version=VERSION, created_at=str(version_raw['created']))
 
     client_id = vk_config['callback']['app_id']
     secret = vk_config['callback']['secret_key']
@@ -74,7 +74,7 @@ def on_unsubscribe():
 def on_unsubscribe_done():
     return render_template('unsubscribe_done.html',
                            success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
-                           prefix=vk_config['callback']['redirect_prefix'], version=str(VERSION), created_at=str(version_raw['created']))
+                           prefix=vk_config['callback']['redirect_prefix'], version=VERSION, created_at=str(version_raw['created']))
 
 
 @app.route('/subscribe', methods=['POST'])
@@ -117,4 +117,4 @@ def on_subscribe_done():
     result = request.args.get('result', '')
     return render_template('subscribe_done.html', result=result,
                            success_redirect_uri=vk_config['callback']['sub_success_redirect_uri'],
-                           prefix=vk_config['callback']['redirect_prefix'], version=str(VERSION), created_at=str(version_raw['created']))
+                           prefix=vk_config['callback']['redirect_prefix'], version=VERSION, created_at=str(version_raw['created']))

@@ -19,6 +19,7 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+<center><code>Satyr сейчас находится в стадии открытого {{ 'beta' if version.beta else 'alpha'  }} тестирования.<br>Некоторый функционал может работать неправильно.<br>Ваши данные в безопасности.</code></center>
 {% block content %}{% endblock %}
 <div class="version">
 <code>Version: {{ version }}</code>
