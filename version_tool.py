@@ -34,8 +34,11 @@ for i, val in enumerate(argv):
             raise ValueError('Invalid -t parameter')
     elif val == '-ma++':
         major = version.major + 1
+        minor = 0
+        build = 0
     elif val == '-mi++':
         minor = version.minor + 1
+        build = 0
     elif val == '-b++':
         build = version.build + 1
     else:

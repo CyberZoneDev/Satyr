@@ -3,13 +3,14 @@ from threading import Thread
 from vk_api import ApiError
 import asyncio
 import random
-import logging
 
 from source.api import Vk
 from source.database.methods import *
 from source.database.models import *
 from source.database import Session
 from source.utils import Utils
+from core import *
+from source.utils import LoggerFactory
 
 
 class GroupsWatchDog(Thread):
@@ -24,7 +25,9 @@ class GroupsWatchDog(Thread):
         self.__db_users = UserMethods(session=self.__db_session)
         self.__db_tokens = TokenMethods(session=self.__db_session)
         self.__service_vk = Vk()
-        self.__logger = logging.getLogger(GroupsWatchDog.__name__)
+        self.__logger = LoggerFactory.get_logger(GroupsWatchDog.__name__)
+        self.__epoch_delay = engine_config['epoch_delay']
+        self.__task_delay = engine_config['task_delay']
 
     async def __like(self, token: Token, group: Group, post: Post, delay: int) -> bool:
         await asyncio.sleep(delay)
@@ -42,6 +45,9 @@ class GroupsWatchDog(Thread):
             elif e.error.get('error_code') == 18:
                 self.__logger.warning(f'I will disable token for user_id: {token.user_id} cause of 18')
                 self.__db_tokens.disable(token)
+            return False
+        except Exception as e:
+            self.__logger.error(f'Something went wrong with "like" coroutine.\n{e}')
             return False
 
     def __bind_groups(self) -> None:
@@ -74,6 +80,7 @@ class GroupsWatchDog(Thread):
         self.__logger.debug('Info bound')
 
         tasks = []
+        loop = Utils.get_event_loop()
 
         for group in self.__db_groups.get():
             for post in group.posts:
@@ -85,19 +92,26 @@ class GroupsWatchDog(Thread):
                 if len(users_not_liked) > 0:
                     for user in users_not_liked:
                         # Will like post with some random delay
-                        tasks.append(self.__like(user.token, group, post, random.randint(60, 86400)))
+                        task = loop.create_task(
+                            self.__like(user.token, group, post, random.randint(*self.__task_delay)))
+                        task.set_name(f'Like -> user_id: {user.id} | post_id: {post.id}')
+                        tasks.append(task)
 
         if tasks:
-            loop = Utils.get_event_loop()
             loop.run_until_complete(asyncio.wait(tasks))
             tasks.clear()
-            loop.close()
+
+        loop.close()
 
     def run(self) -> None:
         retries = 0
         self.__logger.info('Work started')
         while True:
             try:
+                self.__logger.info(f'Outdated likes cleared: {self.__db_likes.delete_old()}')
+                self.__logger.info(f'Outdated posts cleared: {self.__db_posts.delete_old()}')
+                self.__logger.info(f'Outdated users cleared: {self.__db_users.delete_old()}')
+
                 self.__routine()
                 retries = 0
             except Exception as e:
@@ -106,4 +120,4 @@ class GroupsWatchDog(Thread):
                     self.__logger.fatal('Tried to restart routine 3 times. Shutting down...')
                     exit(-1)
                 retries += 1
-            sleep(30)
+            sleep(self.__epoch_delay)

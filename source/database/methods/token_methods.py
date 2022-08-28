@@ -4,18 +4,19 @@ from .base_methods import BaseMethod
 from .. import Session
 from ..models import Token
 from source.utils import Aes
-from os import environ
+from core import S_T_K
 
 
 class TokenMethods(BaseMethod):
     def __init__(self, session=Session()):
         BaseMethod.__init__(self, Token, session)
 
-    def add(self, c_object: Token) -> Optional[Token]:
+    def add(self, c_object: Token, **kwargs) -> Optional[Token]:
         if not isinstance(c_object, self.type):
             raise TypeError(f'Invalid type. Wanted: {self.type}, Got: {c_object.__class__}')
 
-        c_object.content = Aes.encrypt(c_object.content, environ['S_T_K'])
+        if isinstance(c_object.content, str):
+            c_object.content = Aes.encrypt(c_object.content, S_T_K)
 
         try:
             self.session.add(c_object)
@@ -46,13 +47,8 @@ class TokenMethods(BaseMethod):
         if not isinstance(c_object, self.type):
             raise TypeError(f'Invalid type. Wanted: {self.type}, Got: {c_object.__class__}')
 
-        # old = self.get(uid=c_object.uid)
-        # if not old:
-        #     raise ValueError('This object does not exist in database')
-        # old = old[0]
-        #
-        # if old.content != c_object.content:
-        #     c_object.content = Aes.encrypt(c_object.content, environ['S_T_K'])
+        if isinstance(c_object.content, str):
+            c_object.content = Aes.encrypt(c_object.content, S_T_K)
 
         try:
             self.session.commit()

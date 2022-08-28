@@ -22,8 +22,20 @@
     "port": "8000"
   },
   "logging": {
-    "enable": true,
-    "path": "satyr.log"
+    "enabled": true,
+    "path": "satyr.log",
+    "level": "info"
+  },
+  "engine": {
+    "epoch_delay": 30,
+    "task_delay": [
+      60,
+      40000
+    ]
+  },
+  "lifetimes": {
+    "like": 31,
+    "user": 31,
+    "post": 31
   }
-
 }
